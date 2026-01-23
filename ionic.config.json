@@ -1,0 +1,7 @@
+{
+  "name": "gro",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
