@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, Alert } from 'react-native';
-import { db } from "../../Firebaseconfig";
+import { db ,authentication } from "../../Firebaseconfig";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, set, push } from "firebase/database";
 import { useNavigation } from "@react-navigation/native";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Checkout = ({ options, selected, setSelected }) => {
+
   return (
     <View>
       {options.map((opt, idx) => (
@@ -47,6 +48,34 @@ const Checkout = ({ options, selected, setSelected }) => {
 };
 
 function CheckoutScreen() {
+  useEffect(() => {
+  const getEmail = async () => {
+    const email = await AsyncStorage.getItem("userEmail");
+    setUserEmail(email);
+  };
+  getEmail();
+}, []);
+const [Id, setOrderId] = useState(null);
+
+  useEffect(() => {
+    const getOrderId = async () => {
+      try {
+        const id = await AsyncStorage.getItem("lastOrderId");
+if (id !== null) {
+  setOrderId(parseInt(id, 10));
+}
+
+      } catch (e) {
+        console.error("Failed to load orderId", e);
+      }
+    };
+    getOrderId();
+  }, []);
+
+
+
+const user = authentication.currentUser;
+const userEmail = user ? user.email : null;
   const [form, setForm] = useState({
     Name: "",
     lastName: "",
@@ -58,7 +87,9 @@ function CheckoutScreen() {
     MobileNumber: "",
     cardNumber: "",
     expiry: "",
-    cvv: ""
+    cvv: "" ,
+    userId: userEmail
+    
   });
 
   const [selected, setSelected] = useState(null); // ✅ moved here
@@ -108,8 +139,12 @@ const navigation = useNavigation();  // ✅ get navigation object
 const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        await push(ref(db, "checkout"), {
+        await set(ref(db, `checkout/${Id}`), {
+
           ...form,
+          Id: Id, // ✅ inject here at submit time
+
+
           PaymentMethod: selected,
           createdAt: new Date().toISOString()
         });

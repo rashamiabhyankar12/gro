@@ -16,7 +16,7 @@ import {
   removeFromCart,
 } from "../../Redux/CartSlice";
 import { useNavigation } from "@react-navigation/native";
-import { ref, set, push } from "firebase/database";
+import { ref, set, push ,runTransaction} from "firebase/database";
 import { db ,authentication } from "../../Firebaseconfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const Cart = () => {
@@ -181,27 +181,45 @@ const userEmail = user ? user.email : null;
         <TouchableOpacity
   onPress={async () => {
     try {
-      // ✅ Create one order object with all cart items
-      const orderRef = ref(db, "Orders");
+  // Create a reference to Orders
+  //const orderRef = ref(db, "Orders");
 
-      await push(orderRef, {
-          userId: userEmail, // include user context if needed
-        createdAt: Date.now(),
+  // Generate a new child reference with a unique key
+  //const newOrderRef = push(orderRef);
 
-        CartDetails: storeData.map((item) => ({
-          ProductName: item.ProductName,
-          UnitPrice: item.Price,
-          Quantity: item.quantity,
-          Image: item.Image,
-          ProductId: item.Id
-        })),
-      });
+  // Get the unique orderId
+  //const Id = newOrderRef.key;
+const counterRef = ref(db, "orderCounter");
 
-      // Navigate after saving
-      nav.navigate("OrderPlaced");
-    } catch (error) {
-      console.error("Error saving order:", error);
-    }
+const result = await runTransaction(counterRef, (currentValue) => {
+  if (currentValue === null) return 1;
+  return currentValue + 1;
+});
+
+const newId = result.snapshot.val();
+
+await set(ref(db, "Orders/" + newId), {
+  Id: newId,
+  userId: userEmail,
+  createdAt: Date.now(),
+  CartDetails: storeData.map((item) => ({
+    ProductName: item.ProductName,
+    UnitPrice: item.Price,
+    Quantity: item.quantity,
+    Image: item.Image,
+    ProductId: item.Id, // ✅ lowercase
+    userId: userEmail,
+  })),
+});
+
+await AsyncStorage.setItem("lastOrderId", String(newId));
+nav.navigate("OrderPlaced");
+
+} catch (error) {
+  console.error("Error saving order:", error);
+}
+
+
   }}
   activeOpacity={0.8}
   style={{

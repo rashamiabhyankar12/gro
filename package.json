@@ -6,10 +6,11 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build": "react-scripts build"
   },
   "dependencies": {
-    "@capacitor/android": "8.0.1",
+    "@capacitor/android": "^8.0.1",
     "@capacitor/core": "^8.0.1",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -35,7 +36,8 @@
     "react-native-uuid": "^2.0.3",
     "react-native-vector-icons": "^10.3.0",
     "react-native-web": "^0.21.0",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "react-scripts": "^0.0.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.0.1",

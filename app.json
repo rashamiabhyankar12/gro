@@ -21,14 +21,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/playstore-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.rashami.gro"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/playstore-icon.png"
     },
     "plugins": [
       "expo-router",
